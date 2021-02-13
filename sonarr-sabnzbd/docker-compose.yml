@@ -1,18 +1,21 @@
 version: '3'
 services:
   sabnzbd:
-    ports: 
-      - 8080:8080
     image: sabnzbd/sabnzbd
     volumes:
       - $HOME/Documents/sabnzbd_config:/datadir
       - $HOME/Downloads:/downloads
   sonarr:
-    ports:
-      - 8989:8989
     image: hotio/sonarr
     volumes:
-      - $HOME/Downloads/:/downloads
+      - $HOME/Downloads:/downloads
       - $HOME/Documents/sonarr_config/:/config
     links:
       - sabnzbd
+  nginx:
+    build: nginx/
+    ports:
+      - 80:80
+    links:
+      - sabnzbd
+      - sonarr
