@@ -1,21 +1,31 @@
 version: '3'
 services:
   sabnzbd:
-    image: sabnzbd/sabnzbd
+    image: sabnzbd/sabnzbd:${SABNZBD_VERSION}
     volumes:
-      - $HOME/Documents/sabnzbd_config:/datadir
-      - $HOME/Downloads:/downloads
+      - ${BASE_CONFIG_DIR}/sabnzbd_config:/datadir
+      - ${DOWNLOAD_DIR}:/downloads
   sonarr:
-    image: hotio/sonarr
+    image: hotio/sonarr:${SONARR_TAG}
     volumes:
-      - $HOME/Downloads:/downloads
-      - $HOME/Documents/sonarr_config/:/config
+      - ${BASE_CONFIG_DIR}/sonarr_config/:/config
+      - ${DOWNLOAD_DIR}:/downloads
+      - helios-media:/media
     links:
       - sabnzbd
   nginx:
-    build: nginx/
+    image: nginx:1.21.5-alpine
     ports:
       - 80:80
+      - 443:443
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/vanquish.local.crt:/var/certycert/vanquish.local.crt
+      - ./nginx/vanquish.local.key:/var/certycert/vanquish.local.key
     links:
       - sabnzbd
       - sonarr
+    
+volumes:
+   helios-media:
+      external: true
