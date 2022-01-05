@@ -19,9 +19,12 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+#      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx:/etc/nginx/templates
       - ./nginx/vanquish.local.crt:/var/certycert/vanquish.local.crt
       - ./nginx/vanquish.local.key:/var/certycert/vanquish.local.key
+    environment:
+      - NGINX_HOST=vanquish.local
     links:
       - sabnzbd
       - sonarr
