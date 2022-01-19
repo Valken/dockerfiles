@@ -1,4 +1,4 @@
-version: '3'
+version: '3.9'
 services:
   sabnzbd:
     image: sabnzbd/sabnzbd:${SABNZBD_VERSION}
@@ -24,10 +24,10 @@ services:
       - ./nginx/vanquish.local.crt:/var/certycert/vanquish.local.crt
       - ./nginx/vanquish.local.key:/var/certycert/vanquish.local.key
     environment:
-      - NGINX_HOST=vanquish.local
-    links:
-      - sabnzbd
-      - sonarr
+      - NGINX_HOST
+#    links:
+#      - sabnzbd
+#      - sonarr
     
 volumes:
    helios-media:
