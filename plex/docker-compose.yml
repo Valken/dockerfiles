@@ -1,0 +1,15 @@
+version: '3.9'
+services:
+  plex:
+    container_name: plex
+    image: plexinc/pms-docker
+    restart: unless-stopped
+    environment:
+      - TZ="Europe/Dublin"
+      - PLEX_UID=1026
+      - PLEX_GID=100
+    network_mode: host
+    volumes:
+      - /volume1/Media/:/data
+      - /volume1/docker/plex/config:/config
+      - /volume1/docker/plex/transcode:/transcode
