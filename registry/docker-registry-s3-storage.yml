@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Provision resources for an S3 backend for a Docker registry"
+
+Resources:
+  DockerRegistryData:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: "aws:kms"
+              KMSMasterKeyID: KMS-KEY-ARN
+
+  S3AccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Permissions to write to an S3 bucket to store Docker images
+      # https://github.com/docker/docker.github.io/blob/master/registry/storage-drivers/s3.md#s3-permission-scopes
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:ListBucket
+              - s3:GetBucketLocation
+              - s3:ListBucketMultipartUploads
+            Resource: !GetAtt DockerRegistryData.Arn
+          - Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:GetObject
+              - s3:DeleteObject
+              - s3:ListMultipartUploadParts
+              - s3:AbortMultipartUpload
+            Resource: !Sub ${DockerRegistryData.Arn}/*
+
+  DockerRegistryUser:
+    Type: AWS::IAM::User
+    Properties:
+      ManagedPolicyArns:
+        - !Ref S3AccessPolicy
+
+Outputs:
+  BucketName:
+    Value: !Ref DockerRegistryData
+
+  UserName:
+    Value: !Ref DockerRegistryUser
