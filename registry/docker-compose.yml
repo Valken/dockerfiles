@@ -1,0 +1,18 @@
+version: '3.9'
+services:
+  registry:
+    restart: always
+    image: registry:2
+    ports:
+      - 5001:5000
+    environment:
+      REGISTRY_HTTP_TLS_CERTIFICATE: /certs/domain.crt
+      REGISTRY_HTTP_TLS_KEY: /certs/domain.key
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+    volumes:
+      - /Users/neil/Development/Data/RegistryData:/var/lib/registry
+      - ${CERT_PATH}:/certs/domain.crt
+      - ${KEY_PATH}:/certs/domain.key
+      - ${AUTH_PATH}:/auth
