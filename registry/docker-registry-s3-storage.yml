@@ -9,7 +9,6 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: "aws:kms"
-              KMSMasterKeyID: KMS-KEY-ARN
 
   S3AccessPolicy:
     Type: AWS::IAM::ManagedPolicy
