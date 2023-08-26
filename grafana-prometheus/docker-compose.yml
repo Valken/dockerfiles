@@ -7,7 +7,7 @@ services:
     ports:
       - 9090:9090
     volumes:
-      - $PWD/prometheus:/etc/prometheus
+      - ${PROMETHEUS_DATA}:/etc/prometheus
   grafana:
     image: grafana/grafana-enterprise
     container_name: grafana
@@ -15,4 +15,4 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - $PWD/grafana:/var/lib/grafana
+      - ${GRAFANA-_DATA}:/var/lib/grafana
