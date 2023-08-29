@@ -15,4 +15,4 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ${GRAFANA-_DATA}:/var/lib/grafana
+      - ${GRAFANA_DATA}:/var/lib/grafana
