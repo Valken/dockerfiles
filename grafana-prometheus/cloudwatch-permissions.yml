@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Grafana permissions
+Resources:
+  GrafanaReadonly:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+            - cloudwatch:DescribeAlarmsForMetric
+            - cloudwatch:DescribeAlarmHistory
+            - cloudwatch:DescribeAlarmsForMetric
+            - cloudwatch:ListMetrics
+            - cloudwatch:GetMetricData
+            - cloudwatch:GetInsightRuleReport
+            Resource: "*"
+          - Effect: Allow
+            Action:
+            - logs:DescribeLogGroups
+            - logs:GetLogFields
+            - logs:StartQuery
+            - logs:StopQuery
+            - logs:GetQueryResults
+            - logs:GetLogEvents
+            Resource: "*"
+          - Effect: Allow
+            Action:
+            - ec2:DescribeTags
+            - ec2:DescribeInstances
+            - ec2:DescribeRegions
+            Resource: "*"
+          - Effect: Allow
+            Action: tag:GetResources
+            Resource: "*"
+# Outputs:
+#   GrafanaReadonly: !
