@@ -1,34 +1,74 @@
 version: '3.9'
 services:
+  sabnzbd-old:
+    container_name: sabnzbd-old
+    image: sabnzbd/sabnzbd:latest
+    volumes:
+      - /volume1/docker/sabnzbd_config:/datadir
+      - /volume1/Downloads:/downloads
+    environment:
+      - SABNZBD_UID=1026
+      - SABNZBD_GID=100
+#    ports:
+#      - 8080:8080
   sabnzbd:
-    image: sabnzbd/sabnzbd:${SABNZBD_VERSION}
+    container_name: sabnzbd
+    image: lscr.io/linuxserver/sabnzbd:latest
     volumes:
-      - ${BASE_CONFIG_DIR}/sabnzbd_config:/datadir
-      - ${DOWNLOAD_DIR}:/downloads
+      - ${SABNZBD_CONFIG_DIR}:/config
+      - /volume1/Downloads:/downloads
+    environment:
+      - PUID=1026
+      - PGID=100
+      - TZ=Etc/UTC
+ #   ports:
+ #     - 8081:8080
   sonarr:
-    image: hotio/sonarr:${SONARR_TAG}
+    container_name: sonarr
+    image: ghcr.io/hotio/sonarr:latest
     volumes:
-      - ${BASE_CONFIG_DIR}/sonarr_config/:/config
-      - ${DOWNLOAD_DIR}:/downloads
-      - helios-media:/media
-    links:
-      - sabnzbd
+      - ${SONARR_CONFIG_DIR}:/config
+      - /volume1/Downloads:/downloads
+      - /volume1/Media:/media
+    environment:
+      - PUID=1026
+      - PGID=100
+    healthcheck:
+      test: curl --fail -L http://localhost:8989/ping || exit 1
+      interval: 40s
+      timeout: 30s
+      retries: 3
+      start_period: 60s
+  radarr:
+    container_name: radarr
+    image: ghcr.io/hotio/radarr:latest
+    volumes:
+     - ${RADARR_CONFIG_DIR}:/config
+     - /volume1/Downloads:/downloads
+     - /volume1/Media:/media
+    environment:
+     - PUID=1026
+     - PGID=100
+     - UMASK=002
+     - TZ="Etc/UTC
+    ports:
+     - 7878:7878
+  # TODO: .env file and add /radarr to Nginx config. Update ValkenProxy
   nginx:
-    image: nginx:1.21.5-alpine
+    container_name: nginx-sabnzbd-sonarr
+    image: nginx:1.28.0-alpine
     ports:
       - 80:80
       - 443:443
     volumes:
-#      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       - ./nginx:/etc/nginx/templates
-      - ./nginx/vanquish.local.crt:/var/certycert/vanquish.local.crt
-      - ./nginx/vanquish.local.key:/var/certycert/vanquish.local.key
+      - ${CERT_FILE}:/var/certs/server.crt
+      - ${KEY_FILE}:/var/certs/server.key
     environment:
-      - NGINX_HOST
-#    links:
-#      - sabnzbd
-#      - sonarr
-    
-volumes:
-   helios-media:
-      external: true
+      - NGINX_HOST=${NGINX_HOST}
+    depends_on:
+      sonarr:
+        condition: service_healthy
+#        restart: false # Don't want this service to restart if sonarr changes
+      sabnzbd-old:
+        condition: service_started
