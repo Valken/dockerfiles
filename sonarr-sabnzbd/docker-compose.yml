@@ -1,16 +1,14 @@
 version: '3.9'
 services:
-  sabnzbd-old:
-    container_name: sabnzbd-old
-    image: sabnzbd/sabnzbd:latest
-    volumes:
-      - /volume1/docker/sabnzbd_config:/datadir
-      - /volume1/Downloads:/downloads
-    environment:
-      - SABNZBD_UID=1026
-      - SABNZBD_GID=100
-#    ports:
-#      - 8080:8080
+  # sabnzbd-old:
+  #   container_name: sabnzbd-old
+  #   image: sabnzbd/sabnzbd:latest
+  #   volumes:
+  #     - /volume1/docker/sabnzbd_config:/datadir
+  #     - /volume1/Downloads:/downloads
+  #   environment:
+  #     - SABNZBD_UID=1026
+  #     - SABNZBD_GID=100
   sabnzbd:
     container_name: sabnzbd
     image: lscr.io/linuxserver/sabnzbd:latest
@@ -53,6 +51,12 @@ services:
      - TZ="Etc/UTC
     ports:
      - 7878:7878
+    healthcheck:
+      test: curl --fail -L http://localhost:7878/ping || exit 1
+      interval: 40s
+      timeout: 30s
+      retries: 3
+      start_period: 60s
   # TODO: .env file and add /radarr to Nginx config. Update ValkenProxy
   nginx:
     container_name: nginx-sabnzbd-sonarr
@@ -70,5 +74,5 @@ services:
       sonarr:
         condition: service_healthy
 #        restart: false # Don't want this service to restart if sonarr changes
-      sabnzbd-old:
-        condition: service_started
+      # sabnzbd-old:
+      #   condition: service_started
