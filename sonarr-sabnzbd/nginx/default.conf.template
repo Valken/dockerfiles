@@ -14,8 +14,8 @@ server {
     	ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384;
     	ssl_prefer_server_ciphers off;
 
-    	ssl_certificate /var/certycert/vanquish.local.crt;
-    	ssl_certificate_key /var/certycert/vanquish.local.key;
+    	ssl_certificate /var/certs/server.crt;
+    	ssl_certificate_key /var/certs/server.key;
 
         location / {
                 # First attempt to serve request as file, then
@@ -30,9 +30,9 @@ server {
                 proxy_set_header    X-Forwarded-Server $host;
                 proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_set_header    X-Real-IP $remote_addr;
-    }
-
-        location /sabnzbd {
+        }
+        
+	location /sabnzbd {
                 proxy_pass          http://sabnzbd:8080/sabnzbd;
                 proxy_set_header    X-Forwarded-Host $host;
                 proxy_set_header    X-Forwarded-Server $host;
